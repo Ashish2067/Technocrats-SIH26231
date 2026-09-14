@@ -1,0 +1,38 @@
+# Python Bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.env
+.venv/
+venv/
+env/
+ENV/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary and local scratch files
+scratch/
+tmp/
+.tempmediaStorage/
+
+# IDE & Operating System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# PS26231 Runtime Evidence & Debug Artifacts (generated dynamically)
+data/evidence/*
+!data/evidence/.gitkeep
+data/debug/*
+!data/debug/.gitkeep
+
+# Runtime SQLite Databases (created on application initialization)
+data/*.db
+data/*.sqlite

@@ -4,6 +4,7 @@ Main Application Entry Point.
 Launches the field companion web UI or runs an automated end-to-end CLI demonstration.
 """
 import sys
+import os
 import argparse
 from pathlib import Path
 from src.config import DEMO_SAMPLES_DIR, STANDARD_DISCLAIMER
@@ -112,9 +113,10 @@ def start_server(port=5000, host="0.0.0.0"):
 
 
 if __name__ == "__main__":
+    default_port = int(os.environ.get("PORT", 5000))
     parser = argparse.ArgumentParser(description="PS26231 Digital Companion for Field Drug Testing")
     parser.add_argument("--cli", action="store_true", help="Run command-line demonstration across sample cases")
-    parser.add_argument("--port", type=int, default=5000, help="Web server port (default: 5000)")
+    parser.add_argument("--port", type=int, default=default_port, help=f"Web server port (default: {default_port})")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Web server host (default: 0.0.0.0)")
 
     args = parser.parse_args()

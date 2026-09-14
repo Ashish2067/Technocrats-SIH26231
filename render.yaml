@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ps26231-field-companion
+    runtime: python
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -w 2 -b 0.0.0.0:$PORT wsgi:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: PYTHONUNBUFFERED
+        value: "1"
