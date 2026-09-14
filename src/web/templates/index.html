@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block title %}Field Test — SIH26231{% endblock %}
+
+{% block content %}
+<div class="test-runner-grid">
+  <!-- Left Column: Input & Capture Setup -->
+  <div class="panel setup-panel">
+    <div class="panel-header">
+      <h2>Field Test Setup</h2>
+      <span class="step-indicator">Operator Station</span>
+    </div>
+
+    <form id="test-form" onsubmit="return false;" class="test-form">
+      <!-- Operator ID -->
+      <div class="form-group">
+        <label for="operator-id">Officer / Operator ID</label>
+        <div class="input-with-icon">
+          <input type="text" id="operator-id" name="operator_id" value="OFFICER-442" placeholder="e.g. OFFICER-442" required>
+        </div>
+      </div>
+
+      <!-- Kit Profile Selector -->
+      <div class="form-group">
+        <label for="kit-profile">Test Kit Reagent</label>
+        <select id="kit-profile" name="profile_id" onchange="onProfileChange()">
+          {% for p in profiles %}
+            <option value="{{ p.profile_id }}" data-timing="{{ p.timing_seconds }}" data-name="{{ p.name }}" data-disclaimer="{{ p.disclaimer }}" data-pos="{{ p.targets.positive.label }}" data-neg="{{ p.targets.negative.label }}">
+              {{ p.profile_id }} &mdash; {{ p.name }}
+            </option>
+          {% endfor %}
+        </select>
+        <div id="profile-info-box" class="field-hint">
+          Reaction time: <strong id="meta-timing">30</strong>s &bull; Expected positive: <span id="meta-pos-label">Purple Proxy</span> &bull; Negative: <span id="meta-neg-label">Pale Amber Proxy</span>
+        </div>
+      </div>
+
+      <!-- GPS Capture -->
+      <div class="form-group">
+        <label>Location Telemetry</label>
+        <div class="gps-bar">
+          <button type="button" id="btn-gps" class="btn btn-secondary btn-sm" onclick="acquireGPS()">
+            Acquire GPS
+          </button>
+          <div id="gps-status" class="gps-pill">Location not acquired (will record as unavailable)</div>
+        </div>
+        <input type="hidden" id="gps-data" name="gps" value="{}">
+      </div>
+
+      <!-- Image Source Selection: Upload or Camera -->
+      <div class="form-group">
+        <div class="section-subheading">
+          <span>Test Photo</span>
+          <small class="help-text">Include the reference colour card beside the test well</small>
+        </div>
+        
+        <div class="capture-tabs">
+          <button type="button" id="tab-upload" class="tab-btn active" onclick="switchInputMode('upload')">Upload Photo</button>
+          <button type="button" id="tab-camera" class="tab-btn" onclick="switchInputMode('camera')">Camera</button>
+        </div>
+
+        <div id="mode-upload" class="input-panel">
+          <input type="file" id="file-input" accept="image/*" onchange="onFileSelected(this)">
+          <div class="dropzone" onclick="document.getElementById('file-input').click()">
+            <div class="dropzone-icon">&#128247;</div>
+            <p class="dropzone-title">Tap to choose photo or drag file here</p>
+            <p class="dropzone-hint">Ensure reference card is in the frame</p>
+          </div>
+        </div>
+
+        <div id="mode-camera" class="input-panel" style="display:none;">
+          <div class="camera-viewport">
+            <video id="camera-feed" autoplay playsinline></video>
+            <canvas id="camera-canvas" style="display:none;"></canvas>
+            <div class="card-overlay-guide">
+              <div class="guide-box">Align card and test well inside frame</div>
+            </div>
+          </div>
+          <div class="camera-actions">
+            <button type="button" id="btn-start-camera" class="btn btn-secondary btn-sm" onclick="startCamera()">Start Camera</button>
+            <button type="button" id="btn-snap" class="btn btn-primary btn-sm" onclick="captureSnapshot()" disabled>Take Photo</button>
+          </div>
+          <div id="camera-telemetry" class="camera-telemetry" style="display:none;"></div>
+        </div>
+
+        <!-- Image Preview -->
+        <div id="image-preview-container" style="display:none;" class="preview-box">
+          <div class="preview-header">
+            <span>Staged Photo: <strong id="preview-filename"></strong></span>
+            <button type="button" class="btn-link-action" onclick="document.getElementById('file-input').click()">Change</button>
+          </div>
+          <img id="image-preview" alt="Staged test photo">
+        </div>
+      </div>
+
+      <!-- Submit Action -->
+      <div class="form-actions">
+        <button type="button" id="btn-analyze" class="btn btn-primary btn-lg btn-analyze" onclick="executeAnalysis()" disabled>
+          Analyze Test
+        </button>
+      </div>
+
+      <!-- Demonstration / Developer Tools (Secondary Collapsible Drawer) -->
+      <details class="demo-drawer">
+        <summary class="demo-drawer-summary">
+          <span>Demonstration &amp; Test Vectors</span>
+          <span class="qa-badge">QA Tools</span>
+        </summary>
+        <div class="demo-drawer-body">
+          <p class="demo-drawer-desc">Select a pre-recorded test sample to evaluate classification and quality rejection:</p>
+          <div class="demo-buttons-grid">
+            <button type="button" class="btn btn-demo" onclick="loadDemoSample('sample_alpha_positive.jpg', 'SIM-PROFILE-ALPHA')" title="Test Reagent Alpha Positive Outcome">
+              <span class="swatch swatch-purple"></span>
+              <span class="demo-label">Positive <span class="demo-hint">(Purple)</span></span>
+            </button>
+            <button type="button" class="btn btn-demo" onclick="loadDemoSample('sample_alpha_negative.jpg', 'SIM-PROFILE-ALPHA')" title="Test Reagent Alpha Negative Outcome">
+              <span class="swatch swatch-amber"></span>
+              <span class="demo-label">Negative <span class="demo-hint">(Amber)</span></span>
+            </button>
+            <button type="button" class="btn btn-demo btn-demo-inconclusive" onclick="loadDemoSample('sample_alpha_inconclusive.jpg', 'SIM-PROFILE-ALPHA')" title="Test Indeterminate / Borderline Outcome">
+              <span class="swatch swatch-inconclusive"></span>
+              <span class="demo-label">Inconclusive</span>
+            </button>
+            <button type="button" class="btn btn-demo" onclick="loadDemoSample('sample_beta_positive.jpg', 'SIM-PROFILE-BETA')" title="Test Reagent Beta Positive Outcome">
+              <span class="swatch swatch-blue"></span>
+              <span class="demo-label">Beta Pos <span class="demo-hint">(Blue)</span></span>
+            </button>
+            <button type="button" class="btn btn-demo" onclick="loadDemoSample('sample_beta_negative.jpg', 'SIM-PROFILE-BETA')" title="Test Reagent Beta Negative Outcome">
+              <span class="swatch swatch-clear"></span>
+              <span class="demo-label">Beta Neg <span class="demo-hint">(Clear)</span></span>
+            </button>
+            <button type="button" class="btn btn-demo btn-demo-qa" onclick="loadDemoSample('sample_blurry_rejection.jpg', 'SIM-PROFILE-ALPHA')" title="Test Image Quality Blur Rejection Vector">
+              <span class="qa-badge">QA</span>
+              <span class="demo-label">Blur Rejection</span>
+            </button>
+            <button type="button" class="btn btn-demo btn-demo-qa" onclick="loadDemoSample('sample_glare_rejection.jpg', 'SIM-PROFILE-ALPHA')" title="Test Image Quality Glare Rejection Vector">
+              <span class="qa-badge">QA</span>
+              <span class="demo-label">Glare Rejection</span>
+            </button>
+          </div>
+        </div>
+      </details>
+    </form>
+  </div>
+
+  <!-- Right Column: Results & Evidence -->
+  <div class="panel results-panel">
+    <div class="panel-header">
+      <h2>Test Result</h2>
+      <span class="step-indicator">Analysis &amp; Record</span>
+    </div>
+
+    <!-- Empty State Placeholder -->
+    <div id="results-empty-state" class="empty-state">
+      <div class="empty-icon">&#128196;</div>
+      <h3>Ready for Analysis</h3>
+      <p>Select a kit profile, stage an image with the reference card, then tap <strong>Analyze Test</strong>.</p>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="results-loading" style="display:none;" class="loading-state">
+      <div class="spinner"></div>
+      <h3>Analyzing Sample...</h3>
+      <p>Evaluating image quality, calibrating color targets, and interpreting reaction.</p>
+    </div>
+
+    <!-- Result Display Container -->
+    <div id="results-content" style="display:none;" class="results-container">
+      
+      <!-- Rejection Banner (if quality checks failed) -->
+      <div id="rejection-banner" class="alert-box alert-danger" style="display:none;">
+        <h4>Optical Capture Rejected &mdash; Recapture Required</h4>
+        <p id="rejection-reason"></p>
+      </div>
+
+      <!-- Classification Result Banner -->
+      <div id="classification-banner" class="result-banner" style="display:none;">
+        <div class="result-header-row">
+          <span class="banner-badge" id="result-badge">-</span>
+          <h3 id="result-title">-</h3>
+        </div>
+        <p id="result-reasoning" class="result-reasoning"></p>
+        <div class="banner-disclaimer">{{ disclaimer }}</div>
+      </div>
+
+      <!-- Digital Evidence Record Card -->
+      <div id="card-evidence-record" class="evidence-card" style="display:none;">
+        <div class="evidence-card-header">
+          <h3>Evidence Record</h3>
+          <span class="badge-evidence">Tamper-evident</span>
+        </div>
+        
+        <div class="evidence-table">
+          <div class="ev-row">
+            <span class="ev-key">Test ID:</span>
+            <span class="ev-val" id="ev-test-id">-</span>
+          </div>
+          <div class="ev-row">
+            <span class="ev-key">Timestamp (UTC):</span>
+            <span class="ev-val" id="ev-timestamp-utc">-</span>
+          </div>
+          <div class="ev-row">
+            <span class="ev-key">Operator:</span>
+            <span class="ev-val" id="ev-operator">-</span>
+          </div>
+          <div class="ev-row">
+            <span class="ev-key">Location:</span>
+            <span class="ev-val" id="ev-gps">-</span>
+          </div>
+          <div class="ev-row">
+            <span class="ev-key">Kit Profile:</span>
+            <span class="ev-val" id="ev-profile">-</span>
+          </div>
+          <div class="ev-row ev-hash-row">
+            <span class="ev-key">SHA-256 Hash:</span>
+            <div class="hash-box">
+              <code id="ev-hash">-</code>
+              <button type="button" class="btn-copy" onclick="copyHash()" title="Copy SHA-256 Hash">Copy</button>
+            </div>
+          </div>
+          <div class="evidence-image-preview" id="ev-image-box" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span class="ev-key">Captured Evidence Image:</span>
+              <button type="button" id="btn-inspect-evidence" class="btn btn-secondary btn-sm btn-inspect-image" onclick="inspectCurrentEvidence()" style="font-size:0.75rem; padding:2px 8px;">Inspect Image</button>
+            </div>
+            <div class="evidence-image-frame" style="cursor:pointer;" onclick="inspectCurrentEvidence()" title="Click to Inspect Evidence Image">
+              <img id="ev-image" alt="Captured Evidence Record" class="evidence-image">
+            </div>
+          </div>
+        </div>
+
+        <div class="evidence-footer">
+          <span class="audit-status">&#10004; Record saved to audit database</span>
+          <a href="/history" class="btn btn-secondary btn-sm">View in Test History &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Secondary Expandable Area: Analysis Details & Optical Metrics -->
+      <details class="technical-details" id="card-technical-details">
+        <summary class="technical-summary">
+          <span>Analysis Details &amp; Optical Metrics</span>
+        </summary>
+        <div class="technical-body">
+          <!-- Quality Check Card -->
+          <div id="card-quality" class="tech-subcard">
+            <div class="tech-subcard-title">
+              <span>Image Quality Verification</span>
+              <span id="badge-quality-overall" class="status-badge">PASS</span>
+            </div>
+            <div class="quality-grid">
+              <div class="quality-pill" id="q-blur">
+                <span class="q-label">Blur Metric:</span>
+                <span class="q-value" id="val-blur">-</span>
+              </div>
+              <div class="quality-pill" id="q-exposure">
+                <span class="q-label">Exposure:</span>
+                <span class="q-value" id="val-exposure">-</span>
+              </div>
+              <div class="quality-pill" id="q-glare">
+                <span class="q-label">Specular Glare:</span>
+                <span class="q-value" id="val-glare">-</span>
+              </div>
+              <div class="quality-pill" id="q-card">
+                <span class="q-label">Reference Card:</span>
+                <span class="q-value" id="val-card">-</span>
+              </div>
+            </div>
+            <div id="quality-issues-list" class="issues-box" style="display:none;"></div>
+          </div>
+
+          <!-- Colour Science & Calibration Card -->
+          <div id="card-color-science" class="tech-subcard" style="display:none;">
+            <div class="tech-subcard-title">Colorimetric Measurements (CIEDE2000)</div>
+            <div class="color-science-grid">
+              <div class="color-box">
+                <span class="sub-label">Calibrated Reaction Swatch</span>
+                <div class="swatch-large" id="swatch-calibrated"></div>
+                <span class="color-hex" id="text-calibrated-rgb">-</span>
+              </div>
+              <div class="metrics-box">
+                <div class="metric-row">
+                  <span class="metric-name">CIELAB [L*, a*, b*]:</span>
+                  <strong class="metric-val" id="val-lab">-</strong>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-name">&Delta;E to Positive Target:</span>
+                  <strong class="metric-val" id="val-de-pos">-</strong>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-name">&Delta;E to Negative Target:</span>
+                  <strong class="metric-val" id="val-de-neg">-</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

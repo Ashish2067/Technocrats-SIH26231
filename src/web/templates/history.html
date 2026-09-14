@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Searchable Test History — SIH26231{% endblock %}
+
+{% block content %}
+<div class="history-page-container">
+  <div class="page-header">
+    <div>
+      <h2>Searchable Field Test History</h2>
+      <p>Tamper-evident audit log of field colorimetric presumptive tests.</p>
+    </div>
+    <div class="history-actions">
+      <a href="/" class="btn btn-primary btn-sm">+ New Field Assessment</a>
+    </div>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="filter-card">
+    <form id="filter-form" onsubmit="applyFilters(); return false;" class="filter-form-grid">
+      <div class="filter-group">
+        <label for="search-input">Search Identifier (Test ID or Operator)</label>
+        <input type="text" id="search-input" placeholder="e.g. OFFICER-442 or TEST-2026...">
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-profile">Kit Profile</label>
+        <select id="filter-profile" onchange="applyFilters()">
+          <option value="all">All Configured Profiles</option>
+          {% for p in profiles %}
+            <option value="{{ p.profile_id }}">{{ p.profile_id }} ({{ p.name }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-result">Presumptive Outcome</label>
+        <select id="filter-result" onchange="applyFilters()">
+          <option value="all">All Classification Outcomes</option>
+          <option value="Positive">Positive</option>
+          <option value="Negative">Negative</option>
+          <option value="Inconclusive">Inconclusive</option>
+        </select>
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilters()">Reset</button>
+        <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Stats Strip -->
+  <div class="stats-strip">
+    <div class="stat-pill"><span class="stat-num" id="stat-total">0</span> Total Audits</div>
+    <div class="stat-pill pill-pos"><span class="stat-num" id="stat-pos">0</span> Positives</div>
+    <div class="stat-pill pill-neg"><span class="stat-num" id="stat-neg">0</span> Negatives</div>
+    <div class="stat-pill pill-inc"><span class="stat-num" id="stat-inc">0</span> Inconclusives</div>
+  </div>
+
+  <!-- Records Table Container -->
+  <div class="table-card history-table-container">
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>Test Identifier</th>
+          <th>Recorded Timestamp</th>
+          <th>Operator ID</th>
+          <th>Kit Profile</th>
+          <th>Outcome</th>
+          <th>SHA-256 Integrity Digest</th>
+          <th>Inspect Image</th>
+        </tr>
+      </thead>
+      <tbody id="history-table-body">
+        <tr>
+          <td colspan="7" class="loading-cell">Loading test records...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    fetchHistoryRecords();
+  });
+</script>
+{% endblock %}

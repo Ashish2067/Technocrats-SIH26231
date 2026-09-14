@@ -1,0 +1,170 @@
+{
+  "stage1_raw": {
+    "width": 779,
+    "height": 1280,
+    "resolution": "779x1280",
+    "format": "JPEG",
+    "byte_size": 51613,
+    "exif_orientation": "None / Not Specified",
+    "exif_details": {}
+  },
+  "stage2_quality": {
+    "blur_score": 79.1,
+    "blur_threshold": 50.0,
+    "blur_passed": true,
+    "exposure_status": "normal",
+    "exposure_passed": true,
+    "underexposed_ratio": 0.0,
+    "overexposed_ratio": 0.0,
+    "glare_detected": false,
+    "glare_ratio": 0.0,
+    "glare_passed": true,
+    "overall_quality_passed": true,
+    "rejection_reasons": []
+  },
+  "stage3_card_detection": {
+    "card_detected": true,
+    "is_fallback_full_frame": false,
+    "detection_scale": 1.0,
+    "contour_area_pct": 90.9,
+    "quad_points": [
+      [
+        31.0,
+        11.0
+      ],
+      [
+        20.0,
+        1258.0
+      ],
+      [
+        765.0,
+        1259.0
+      ],
+      [
+        771.0,
+        24.0
+      ]
+    ]
+  },
+  "stage4_warp": {
+    "is_portrait_capture": true,
+    "quad_physical_width": 745.0,
+    "quad_physical_height": 1247.0,
+    "initial_warped_shape": [
+      400,
+      240
+    ],
+    "confirms_physical_card_not_frame": true
+  },
+  "stage5_orientation": {
+    "chosen_rotation": "rot_90_ccw",
+    "blue_fiducial_scores": {
+      "rot_90_cw": 0,
+      "rot_90_ccw": 2089,
+      "rot_270_cw": 2089,
+      "rot_270_ccw": 0
+    },
+    "canonical_shape": [
+      240,
+      400
+    ]
+  },
+  "stage6_patches": {
+    "white_rgb": [
+      165.8,
+      173.9,
+      176.0
+    ],
+    "gray_rgb": [
+      131.0,
+      138.6,
+      137.6
+    ],
+    "black_rgb": [
+      77.5,
+      82.9,
+      85.6
+    ],
+    "blue_rgb": [
+      69.5,
+      102.8,
+      131.5
+    ],
+    "sampling_boxes": {
+      "white": [
+        32,
+        33,
+        36,
+        33
+      ],
+      "gray": [
+        32,
+        81,
+        36,
+        33
+      ],
+      "black": [
+        32,
+        127,
+        36,
+        33
+      ],
+      "blue": [
+        32,
+        172,
+        36,
+        33
+      ]
+    }
+  },
+  "stage7_reaction": {
+    "hough_circle_detected": true,
+    "circle_center": [
+      311,
+      104
+    ],
+    "outer_radius": 43,
+    "sample_inner_radius": 21,
+    "reaction_rgb": [
+      168.8,
+      150.3,
+      118.8
+    ]
+  },
+  "stage8_calibration": {
+    "calibration_gains": [
+      1.4475,
+      1.3802,
+      1.3639
+    ],
+    "calibrated_rgb": [
+      244,
+      207,
+      162
+    ],
+    "calibrated_lab": [
+      85.24,
+      6.72,
+      27.22
+    ]
+  },
+  "stage9_classification": {
+    "target_positive_lab": [
+      61.1,
+      -3.2,
+      -23.8
+    ],
+    "target_negative_lab": [
+      90.2,
+      -0.6,
+      5.8
+    ],
+    "delta_e_positive": 37.85,
+    "delta_e_negative": 14.25,
+    "margin": -23.6,
+    "max_delta_e_positive": 15.0,
+    "max_delta_e_negative": 12.0,
+    "final_result": "Inconclusive",
+    "decision_rule": "Does not meet decisive criteria (dE_pos=37.9, dE_neg=14.3)"
+  }
+}

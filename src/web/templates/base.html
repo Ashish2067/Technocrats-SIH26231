@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Field Companion — SIH26231{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}?v=2.2">
+</head>
+<body>
+  <!-- Mandatory Scope & Anti-Hallucination Notice Banner -->
+  <div class="disclaimer-banner">
+    <div class="disclaimer-content">
+      <span class="badge-proxy">SIMULATED / PROXY SYSTEM</span>
+      <span><strong>Presumptive Field Testing Companion:</strong> Does not replace laboratory confirmatory testing. Configured with simulated kit profiles and safe proxy colorimetric reactions.</span>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-logo">PS26231</div>
+        <div class="brand-text">
+          <h1>Field Companion <span>SIH26231</span></h1>
+          <p>Digital Interpretation &amp; Evidence Layer for Field Colorimetric Kits</p>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">Field Test</a>
+        <a href="/history" class="nav-item {% if request.path == '/history' %}active{% endif %}">Test History</a>
+        <a href="/reference-card" class="nav-item {% if request.path == '/reference-card' %}active{% endif %}">Reference Card</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p><strong>PS26231 &mdash; Field Test Companion</strong> &bull; Presumptive Field Drug Testing System</p>
+      <p class="footer-subtext">Presumptive results only. Confirmatory laboratory testing required. Configured with SIMULATED / PROXY profiles for demonstration.</p>
+    </div>
+  </footer>
+
+  <!-- Modal Dialog for Inspecting Evidence Record -->
+  <div id="inspect-modal" class="modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-overlay" onclick="closeModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">Evidence Custody Sheet</h3>
+        <button type="button" class="modal-close" onclick="closeModal()" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body-content">
+        <!-- Injected via JavaScript -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}?v=2.3"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

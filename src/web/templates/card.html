@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Prototype Reference Card — SIH26231{% endblock %}
+
+{% block content %}
+<div class="card-page-container">
+  <div class="page-header">
+    <div>
+      <h2>Prototype Reference Colour Card (Simulated Demonstration)</h2>
+      <p>Optical calibration target used in-frame alongside test wells to normalize ambient lighting variations.</p>
+    </div>
+    <div class="header-actions">
+      <a href="/demo-samples/prototype_reference_card.jpg" download="prototype_reference_card.jpg" class="btn btn-primary btn-sm">&#128190; Download Target Image (JPEG)</a>
+      <button class="btn btn-secondary btn-sm" onclick="window.print()">&#128424; Print Calibration Sheet</button>
+    </div>
+  </div>
+
+  <div class="disclaimer-alert">
+    <strong>Regulatory Notice on Calibration Target:</strong> This target is a minimal prototype designed strictly for demonstrating the safe proxy colorimetric workflow. Its geometry, patch colors, and dimensions are simulated prototype values and do not represent a standardized physical field-kit specification.
+  </div>
+
+  <div class="card-display-wrapper">
+    <div class="printable-card">
+      <div class="card-border">
+        <div class="card-title-bar">
+          <span>PROTOTYPE REFERENCE CARD (SIMULATED DEMO)</span>
+          <span class="card-version">SPEC v1.0-PROTOTYPE</span>
+        </div>
+
+        <div class="card-body-grid">
+          <!-- Left Column: 4 Calibration Patches -->
+          <div class="patches-column">
+            <div class="patch-item">
+              <div class="patch-box" style="background-color: rgb(240, 240, 240); border: 1px solid #cbd5e1;"></div>
+              <div class="patch-desc">
+                <strong>WHITE PATCH</strong>
+                <span>Nominal: sRGB(240, 240, 240)</span>
+              </div>
+            </div>
+
+            <div class="patch-item">
+              <div class="patch-box" style="background-color: rgb(128, 128, 128);"></div>
+              <div class="patch-desc">
+                <strong>GRAY 50%</strong>
+                <span>Nominal: sRGB(128, 128, 128)</span>
+              </div>
+            </div>
+
+            <div class="patch-item">
+              <div class="patch-box" style="background-color: rgb(25, 25, 25);"></div>
+              <div class="patch-desc">
+                <strong>BLACK PEDESTAL</strong>
+                <span>Nominal: sRGB(25, 25, 25)</span>
+              </div>
+            </div>
+
+            <div class="patch-item">
+              <div class="patch-box" style="background-color: rgb(40, 80, 200);"></div>
+              <div class="patch-desc">
+                <strong>REFERENCE BLUE</strong>
+                <span>Nominal: sRGB(40, 80, 200)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Designated Reaction Spot Well -->
+          <div class="reaction-column">
+            <div class="reaction-guide-ring">
+              <div class="reaction-circle-dashed">
+                <span>[+] TEST WELL [+]</span>
+              </div>
+            </div>
+            <p class="reaction-caption">Designated reaction zone sampled by localization engine</p>
+          </div>
+        </div>
+
+        <div class="card-footer-bar">
+          <span>PS26231 Digital Field Companion &bull; In-frame fiducial &amp; white-point normalization target</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="instructions-card">
+    <h3>Field Usage Protocol:</h3>
+    <ol>
+      <li>Position the test kit reaction tube or well directly over or adjacent to the designated reaction guide ring.</li>
+      <li>Ensure all 4 calibration patches are completely visible, flat, and unobstructed.</li>
+      <li>Avoid direct specular glare, extreme shadows, or reflections across the card surface.</li>
+      <li>Capture the photo with the target filling approximately 25% to 60% of the camera frame.</li>
+    </ol>
+  </div>
+</div>
+{% endblock %}
