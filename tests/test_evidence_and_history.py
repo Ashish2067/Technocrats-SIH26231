@@ -71,6 +71,28 @@ class TestEvidenceAndHistory(unittest.TestCase):
         pos_results = search_records(result_filter="Positive")
         self.assertTrue(any(r["test_id"] == record.test_id for r in pos_results))
 
+    def test_seed_demo_history_if_empty(self):
+        from src.history import seed_demo_history_if_empty
+        # Calling seed when records already exist should return 0
+        seeded = seed_demo_history_if_empty(force=False)
+        self.assertEqual(seeded, 0)
+
+        # Force seeding should seed all 5 curated demonstration records
+        forced_seeded = seed_demo_history_if_empty(force=True)
+        self.assertEqual(forced_seeded, 5)
+
+        # Verify seeded records exist in database
+        demo_pos = get_record_by_id("TEST-DEMO-20260914-1015-01AP")
+        self.assertIsNotNone(demo_pos)
+        self.assertEqual(demo_pos["result"], "Positive")
+        self.assertEqual(demo_pos["kit_profile"]["profile_id"], "SIM-PROFILE-ALPHA")
+        self.assertEqual(demo_pos["operator_id"], "DEMO-OFFICER-01")
+
+        demo_beta = get_record_by_id("TEST-DEMO-20260914-1045-04BP")
+        self.assertIsNotNone(demo_beta)
+        self.assertEqual(demo_beta["result"], "Positive")
+        self.assertEqual(demo_beta["kit_profile"]["profile_id"], "SIM-PROFILE-BETA")
+
 
 if __name__ == "__main__":
     unittest.main()

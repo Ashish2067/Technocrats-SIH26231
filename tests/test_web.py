@@ -63,6 +63,21 @@ class TestWebApp(unittest.TestCase):
         self.assertTrue(data["success"])
         self.assertIsInstance(data["records"], list)
 
+    def test_serve_evidence_image_routes(self):
+        # 1. Test existing seeded demo evidence image
+        res1 = self.client.get("/evidence/evidence_TEST-DEMO-20260914-1015-01AP.jpg")
+        self.assertEqual(res1.status_code, 200)
+        self.assertGreater(len(res1.data), 1000)
+
+        # 2. Test direct demo sample lookup
+        res2 = self.client.get("/evidence/sample_alpha_negative.jpg")
+        self.assertEqual(res2.status_code, 200)
+        self.assertGreater(len(res2.data), 1000)
+
+        # 3. Test that missing/non-existent image returns 404
+        res3 = self.client.get("/evidence/non_existent_legacy_test_xyz.jpg")
+        self.assertEqual(res3.status_code, 404)
+
 
 if __name__ == "__main__":
     unittest.main()

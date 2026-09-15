@@ -9,7 +9,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 from src.config import EVIDENCE_DIR, DEMO_SAMPLES_DIR, STANDARD_DISCLAIMER
 from src.engine import list_available_profiles, get_kit_profile
 from src.pipeline import run_pipeline
-from src.history import search_records, get_record_by_id, init_database
+from src.history import search_records, get_record_by_id, init_database, seed_demo_history_if_empty
 from src.demo_data import generate_all_demo_samples
 
 app = Flask(
@@ -18,9 +18,10 @@ app = Flask(
     static_folder=str(Path(__file__).resolve().parent / "static")
 )
 
-# Initialize DB and demo samples on start
+# Initialize DB, demo samples, and curated baseline history on start
 init_database()
 generate_all_demo_samples()
+seed_demo_history_if_empty()
 
 
 @app.route("/")
@@ -121,6 +122,18 @@ def api_history_detail(test_id):
 
 @app.route("/evidence/<filename>")
 def serve_evidence_image(filename):
+    """
+    Serves evidence images with dual-path resolution:
+    1. Primary: Runtime captures / local captures in EVIDENCE_DIR.
+    2. Secondary: Curated demo samples in DEMO_SAMPLES_DIR.
+    Returns HTTP 404 if the requested image does not exist.
+    """
+    if (EVIDENCE_DIR / filename).is_file():
+        return send_from_directory(str(EVIDENCE_DIR), filename)
+
+    if (DEMO_SAMPLES_DIR / filename).is_file():
+        return send_from_directory(str(DEMO_SAMPLES_DIR), filename)
+
     return send_from_directory(str(EVIDENCE_DIR), filename)
 
 

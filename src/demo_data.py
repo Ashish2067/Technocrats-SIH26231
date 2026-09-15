@@ -143,11 +143,27 @@ def embed_in_realistic_scene(card_img: np.ndarray, blur: bool = False, overexpos
     return scene
 
 
-def generate_all_demo_samples():
+def generate_all_demo_samples(overwrite: bool = False):
     """
     Generates all demonstration images into data/demo_samples/
     """
     DEMO_SAMPLES_DIR.mkdir(parents=True, exist_ok=True)
+
+    required = [
+        "sample_alpha_positive.jpg",
+        "sample_alpha_negative.jpg",
+        "sample_alpha_inconclusive.jpg",
+        "sample_beta_positive.jpg",
+        "sample_beta_negative.jpg",
+        "sample_blurry_rejection.jpg",
+        "sample_overexposed_rejection.jpg",
+        "sample_glare_rejection.jpg",
+        "prototype_reference_card.jpg"
+    ]
+    if not overwrite and all((DEMO_SAMPLES_DIR / f).is_file() for f in required):
+        return
+
+    np.random.seed(42)
 
     # 1. Profile Alpha Positive (Purple proxy: RGB ~ 144, 117, 138 matching physical specimen)
     card_alpha_pos = render_prototype_card(reaction_rgb=(144, 117, 138), warm_tint=1.0)
